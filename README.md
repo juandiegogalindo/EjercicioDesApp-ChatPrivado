@@ -34,7 +34,8 @@ git clone https://github.com/juandiegogalindo/EjercicioDesApp-ChatPrivado.git
 
 3. Compilar y ejecutar la aplicación desde el IDE o mediante Ant:
 ```bash
-git clone https://github.com/juandiegogalindo/EjercicioDesApp-ChatPrivado.git
+ant compile
+ant run
 ```
 
 ## 4. Tecnologías Utilizadas
