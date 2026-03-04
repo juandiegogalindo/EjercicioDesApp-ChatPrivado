@@ -23,7 +23,7 @@ public class InterfazApp extends JFrame {
 
         getContentPane().setLayout(null);
         this.setTitle("CHAT PRIVADO");
-        this.setSize(700, 700);
+        this.setSize(800, 700); // Estaba (700,700)
         this.setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
