@@ -61,10 +61,6 @@ El proyecto se apoya en los siguientes conceptos:
 3. **Flujos de datos (`DataInputStream`/`DataOutputStream`):** se usan para serializar y leer cadenas de texto (`writeUTF`/`readUTF`) directamente sobre el flujo del socket.
 4. **Patrón MVC simplificado:** `InterfazApp` y `PanelDatos` conforman la vista, `Controlador` actúa como intermediario, y `HelloSocket` encapsula la lógica de red (modelo/lógica de negocio).
 
-### Conceptos nuevos usados en el código
-
-- **`try-with-resources`** (visto en `HelloSocket.java`, líneas como `try (Socket client = ...; DataOutputStream outBuffer = ...)`): es una variante del bloque `try` que recibe recursos que implementan la interfaz `AutoCloseable` (como `Socket`, `ServerSocket` o los streams). Java se encarga automáticamente de cerrar esos recursos al salir del bloque —ya sea porque terminó normalmente o porque se lanzó una excepción— sin necesidad de escribir un bloque `finally` con `close()` manual. Esto evita fugas de recursos (por ejemplo, un socket que queda abierto por error).
-
 ## 6. Estructura del Proyecto
 
 ```
