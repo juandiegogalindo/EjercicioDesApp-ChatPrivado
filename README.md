@@ -82,6 +82,7 @@ DesarrolloApliaciones-ChatPrivado/
 
 ## 7. Autor
 **Juan Diego Galindo**
+
 Estudiante de Ingeniería de Sistemas - Quinto Semestre
  
 - GitHub: [Juan Diego Galindo](https://github.com/juandiegogalindo)
