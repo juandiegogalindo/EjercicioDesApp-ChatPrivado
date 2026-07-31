@@ -1,60 +1,90 @@
-# EjercicioDesApp - Chat Privado
+# DesarrolloApliaciones - Chat Privado
 
 ## 1. Nombre del Proyecto
 
-**EjercicioDesApp - Chat Privado**
+**Chat Privado (EjercicioDesApp)**
 
-Proyecto académico orientado al desarrollo de una aplicación de chat con comunicación privada entre usuarios implementada en **Java**.
+Proyecto académico de la asignatura Desarrollo de Aplicaciones que implementa un **chat punto a punto (P2P) con interfaz gráfica en Java**, donde cada instancia de la aplicación actúa simultáneamente como **servidor** (escuchando mensajes entrantes) y como **cliente** (enviando mensajes a la IP y puerto del otro participante) usando **sockets TCP**.
 
 ## 2. Características
 
-Este ejercicio incluye:
-
-- Implementación de una aplicación de chat básico que permite interacción entre dos participantes.
-- Comunicación estructurada mediante entrada y salida de mensajes en consola o interfaz básica.
-- Lógica de intercambio de mensajes enfocado en comunicación privada.
-- Uso de estructuras de control y métodos para gestionar el flujo de mensajes y la interacción entre usuarios.
-- Código organizado en paquetes compatibles con compilación y ejecución mediante Ant/IDE. :contentReference[oaicite:1]{index=1}
+- Interfaz gráfica construida con **Swing** para ingresar IP, puerto local, puerto destino y nickname.
+- Comunicación **bidireccional** entre dos instancias de la aplicación mediante `Socket` y `ServerSocket`.
+- Cada instancia levanta un **hilo (`Thread`)** independiente que queda escuchando conexiones entrantes en el puerto local, sin bloquear la interfaz gráfica.
+- Envío de mensajes en tiempo real, identificados con el nickname del remitente.
+- Historial de conversación visible en un área de texto (`JTextArea`) dentro de un panel con scroll.
+- Arquitectura separada en tres capas: interfaz gráfica, controlador y lógica de red (similar a un patrón MVC simplificado).
 
 ## 3. Instalación
 
 ### Requisitos Previos
 
-1. **Java JDK 8 o superior** instalado.
+1. **Java JDK 11 o superior** instalado.
 2. **Git** para clonar el repositorio.
-3. IDE recomendado: **NetBeans**, **Eclipse** o **IntelliJ IDEA**.
+3. IDE recomendado: **NetBeans** (el proyecto está configurado con Apache Ant).
 
 ### Pasos de Instalación
 
 1. Clonar el repositorio:
 ```bash
-git clone https://github.com/juandiegogalindo/EjercicioDesApp-ChatPrivado.git
+git clone https://github.com/juandiegogalindo/DesarrolloApliaciones-ChatPrivado.git
 ```
-2. Abrir el proyecto en tu IDE.
+2. Abrir el proyecto en NetBeans (o importar como proyecto Ant en tu IDE de preferencia).
 
-3. Compilar y ejecutar la aplicación desde el IDE o mediante Ant:
+3. Compilar y ejecutar desde el IDE, o mediante Ant:
 ```bash
 ant compile
 ant run
 ```
 
+### Cómo usar el chat
+
+Para probar la comunicación necesitas **dos instancias** de la aplicación corriendo (en el mismo equipo o en equipos distintos dentro de la misma red):
+
+1. En cada instancia, ingresa la IP del otro participante y un nickname.
+2. Al pulsar "Conectar", se te pedirá el **puerto del otro cliente** (puerto destino) y el **puerto en el que tú vas a escuchar** (puerto local). Estos valores deben cruzarse entre las dos instancias: el puerto destino de una debe ser el puerto local de la otra, y viceversa.
+3. Una vez conectados, el botón "Enviar" se habilita y los mensajes escritos se transmiten por el socket hacia el otro cliente.
+
 ## 4. Tecnologías Utilizadas
 
-1. Java – Lenguaje de programación principal para la lógica del chat.
-2. Apache Ant – Herramienta de construcción y ejecución del proyecto.
-3. Git / GitHub – Control de versiones y alojamiento del código.
-4. IDE Java – Entorno de desarrollo para edición y ejecución.
+1. **Java 11** – Lenguaje principal, con `java.net.Socket` y `java.net.ServerSocket` para la comunicación TCP.
+2. **Swing** – Construcción de la interfaz gráfica (`JFrame`, `JPanel`, `JTextArea`, etc.).
+3. **Apache Ant** – Herramienta de construcción y ejecución del proyecto (gestionado por NetBeans).
+4. **Git / GitHub** – Control de versiones y alojamiento del código.
 
-## 5. Teoría del Juego en Base a la Programación
+## 5. Fundamento Teórico
 
-El ejercicio de Chat Privado recae en los fundamentos de la comunicación entre entidades en sistemas informáticos, implementando un modelo básico de interacción:
-1. Estado de comunicación:
-El sistema define participantes que se comunican mediante mensajes, estableciendo sender (remitente) y receiver (destinatario) en cada ciclo de interacción.
-2. Control de flujo:
-Se implementan estructuras de control para gestionar el envío y recepción de mensajes, posibilitando secuencias condicionales y repetitivas según las acciones del usuario.
-3. Entrada y salida de datos:
-La lectura de mensajes utiliza un flujo de entrada estándar (por ejemplo consola) y la salida de los mensajes se muestra al usuario, simulando un chat entre dos partes.
-4. Modularidad:
-La lógica se organiza en métodos o clases que abstraen el envío y recepción de mensajes, favoreciendo la reutilización y mantenimiento del código.
+El proyecto se apoya en los siguientes conceptos:
 
-Este ejercicio refuerza conceptos de programación orientada a objetos, manejo de entrada/salida, control de flujo y estructuración lógica de procesos de comunicación.
+1. **Comunicación cliente-servidor con sockets TCP:** cada instancia de la aplicación abre un `ServerSocket` que escucha en un puerto local (rol servidor) y, al enviar un mensaje, crea un `Socket` hacia la IP/puerto del destinatario (rol cliente). Esto convierte a cada participante en un nodo "peer" dentro de la conexión.
+2. **Concurrencia con hilos (`Thread`/`Runnable`):** la clase `HelloSocket` implementa `Runnable`, y su método `run()` se ejecuta en un hilo aparte. Esto es indispensable porque `serverSocket.accept()` es una llamada **bloqueante**: si se ejecutara en el hilo principal, la interfaz gráfica se congelaría mientras espera una conexión entrante.
+3. **Flujos de datos (`DataInputStream`/`DataOutputStream`):** se usan para serializar y leer cadenas de texto (`writeUTF`/`readUTF`) directamente sobre el flujo del socket.
+4. **Patrón MVC simplificado:** `InterfazApp` y `PanelDatos` conforman la vista, `Controlador` actúa como intermediario, y `HelloSocket` encapsula la lógica de red (modelo/lógica de negocio).
+
+### Conceptos nuevos usados en el código
+
+- **`try-with-resources`** (visto en `HelloSocket.java`, líneas como `try (Socket client = ...; DataOutputStream outBuffer = ...)`): es una variante del bloque `try` que recibe recursos que implementan la interfaz `AutoCloseable` (como `Socket`, `ServerSocket` o los streams). Java se encarga automáticamente de cerrar esos recursos al salir del bloque —ya sea porque terminó normalmente o porque se lanzó una excepción— sin necesidad de escribir un bloque `finally` con `close()` manual. Esto evita fugas de recursos (por ejemplo, un socket que queda abierto por error).
+
+## 6. Estructura del Proyecto
+
+```
+DesarrolloApliaciones-ChatPrivado/
+├── build.xml                      # Script de construcción Ant
+├── manifest.mf                    # Manifiesto del JAR (clase principal se agrega en build)
+├── nbproject/                     # Configuración interna de NetBeans
+└── src/
+    ├── interfaz/
+    │   ├── InterfazApp.java       # Ventana principal (JFrame), punto de entrada (main)
+    │   └── PanelDatos.java        # Panel con los campos de conexión, chat y botones
+    ├── Controlador/
+    │   └── Controlador.java       # Intermediario entre la interfaz y la capa de red
+    └── mundo/
+        └── HelloSocket.java       # Lógica de sockets: servidor (hilo) y envío de mensajes
+```
+
+**Clase principal:** `interfaz.InterfazApp`
+
+## 7. Autor
+
+**Juan Diego Galindo**
+Estudiante de Ingeniería de Sistemas — Proyecto desarrollado para la asignatura Desarrollo de Aplicaciones.
